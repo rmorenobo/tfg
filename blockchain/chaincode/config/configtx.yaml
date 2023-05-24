@@ -1,0 +1,191 @@
+---
+################################################################################
+#   Section: Organizations
+################################################################################
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ../organizations/ordererOrganizations/universidades.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+        OrdererEndpoints:
+            - orderer.universidades.com:7050
+
+    - &uoc
+        Name: uocMSP
+        ID: uocMSP
+        AnchorPeers:
+            - Host: peer0.uoc.universidades.com
+              Port: 7051
+        MSPDir: ../organizations/peerOrganizations/uoc.universidades.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('uocMSP.admin', 'uocMSP.peer', 'uocMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('uocMSP.admin', 'uocMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('uocMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('uocMSP.peer')"
+
+    - &uib
+        Name: uibMSP
+        ID: uibMSP
+        AnchorPeers:
+            - Host: peer0.uib.universidades.com
+              Port: 9051        
+        MSPDir: ../organizations/peerOrganizations/uib.universidades.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('uibMSP.admin', 'uibMSP.peer', 'uibMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('uibMSP.admin', 'uibMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('uibMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('uibMSP.peer')"
+    - &uab
+        Name: uabMSP
+        ID: uabMSP
+        AnchorPeers:
+            - Host: peer0.uab.universidades.com
+              Port: 9151
+        MSPDir: ../organizations/peerOrganizations/uab.universidades.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('uabMSP.admin', 'uabMSP.peer', 'uabMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('uabMSP.admin', 'uabMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('uabMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('uabMSP.peer')"
+
+################################################################################
+#   SECTION: Capabilities
+################################################################################
+Capabilities:
+    Channel: &ChannelCapabilities
+        V2_0: true
+    Orderer: &OrdererCapabilities
+        V2_0: true
+    Application: &ApplicationCapabilities
+        V2_0: true
+
+################################################################################
+#   SECTION: Application
+################################################################################
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+################################################################################
+#   SECTION: Orderer
+################################################################################
+Orderer: &OrdererDefaults
+    OrdererType: etcdraft
+    Addresses:
+        - orderer.universidades.com:7050
+    EtcdRaft:
+        Consenters:
+        - Host: orderer.universidades.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/universidades.com/orderers/orderer.universidades.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/universidades.com/orderers/orderer.universidades.com/tls/server.crt
+
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+################################################################################
+#   CHANNEL
+################################################################################
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#   Profile
+################################################################################
+Profiles:
+
+    UniversidadesGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *uoc
+                - *uib
+                - *uab
+            Capabilities: *ApplicationCapabilities
