@@ -1,0 +1,9 @@
+{
+   "index": {
+     "fields": ["alumno.idAlumno"]
+   },
+   "ddoc": "index_idAlumno",
+   "name": "index_idAlumno",
+   "type": "json"
+ }
+ 

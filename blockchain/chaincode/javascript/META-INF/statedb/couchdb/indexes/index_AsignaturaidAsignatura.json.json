@@ -1,0 +1,8 @@
+{
+  "index": {
+    "fields": ["asignatura.idAsignatura"]
+  },
+  "ddoc": "index_idAsignatura",
+  "name": "index_idAsignatura",
+  "type": "json"
+}
