@@ -1,0 +1,48 @@
+{
+  "name": "universidades_network",
+  "version": "1.0.0",
+  "client": {
+      "organization": "uoc",
+      "connection": {
+          "timeout": {
+              "peer": {
+                  "endorser": "300"
+              }
+          }
+      }
+  },
+  "organizations": {
+      "uoc": {
+          "mspid": "uocMSP",
+          "peers": [
+              "peer0.uoc.universidades.com"
+          ],
+          "certificateAuthorities": [
+              "ca.uoc.universidades.com"
+          ]
+      }
+  },
+  "peers": {
+      "peer0.uoc.universidades.com": {
+          "url": "grpcs://localhost:7051",
+          "tlsCACerts": {
+              "path": "../blockchain/organizations/peerOrganizations/uoc.universidades.com/peers/peer0.uoc.universidades.com/tls/tlscacerts/tls-localhost-7054-ca-uoc.pem"
+          },
+          "grpcOptions": {
+              "ssl-target-name-override": "peer0.uoc.universidades.com"
+          }
+      }
+  },
+  "certificateAuthorities": {
+      "ca.uoc.universidades.com": {
+          "url": "https://localhost:7054",
+          "caName": "ca-uoc",
+          "tlsCACerts": {
+              "path": "../blockchain/organizations/peerOrganizations/uoc.universidades.com/tlsca/tlsca.uoc.universidades.com-cert.pem"
+          },
+          "httpOptions": {
+              "verify": false
+          }
+      }
+  }
+}
