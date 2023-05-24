@@ -1,0 +1,108 @@
+//esto no es necesario
+//jest.mock('react-native-linear-gradient', () => 'LinearGradient');
+//jest.mock('react-native-webview', () => 'WebView');
+//jest.mock('@react-navigation/bottom-tabs', () => 'createBottomTabNavigator');
+
+//Unitary test
+import renderer from 'react-test-renderer';
+import Nota from '../src/componentes/Nota';
+import {getUniversities} from '../src/lib/api';
+import axios from 'axios';
+
+
+jest.mock('axios');
+//jest.mock('../src/lib/api', () => ({ get: jest.fn() }));
+//axios.get.mockResolvedValue({ data: data.data });
+
+describe('getUniversities', () => {
+    it('fetches successfully data from an API', async () => {
+      const data = {
+        data: [
+            {
+                "objectId": "UAB",
+                "data": {
+                    "idUniversidad": "UAB",
+                    "nombre": "Universitat autònoma de Barcelona"
+                }
+            },
+            {
+                "objectId": "UIB",
+                "data": {
+                    "idUniversidad": "UIB",
+                    "nombre": "Universitat de les Illes Balears"
+                }
+            },
+            {
+                "objectId": "UOC",
+                "data": {
+                    "idUniversidad": "UOC",
+                    "nombre": "Universitat oberta de Catalunya"
+                }
+            },
+            {
+                "objectId": "UPC",
+                "data": {
+                    "idUniversidad": "UPC",
+                    "nombre": "Universitat politècnica de Catalunya"
+                }
+            }
+        ],
+      };
+      console.log('Exec');
+      let data2 = await getUniversities();
+      console.log('Values');
+      console.log(data2);
+      
+
+      //axios.get.mockResolvedValue(data);
+      axios.get.mockResolvedValue({ data: data });
+      await expect(getUniversities()).resolves.toEqual(data.data);
+      expect(axios.get).toHaveBeenCalledWith('/queryAllByType/Universidad');
+
+
+
+    });
+  
+    it('fetches erroneously data from an API', async () => {
+        const errorMessage = 'Network Error';
+
+        axios.get.mockImplementationOnce(() =>
+            Promise.reject(new Error(errorMessage)),
+        );
+
+        await expect(getUniversities()).rejects.toThrow(errorMessage);
+    });
+});
+
+//Verifica renderizado
+
+describe('Verificación renderizado notas', () => {
+    it('renders correctly', () => {
+       renderer.create(<Nota />);
+     });
+    });
+    
+
+ ///Verificar que pinta bien la lista...
+  test('renders correct number of items after API call', async () => {
+    const data = {
+        data: {
+            hits: [
+                { objectID: '1', title: 'Item 1' },
+                { objectID: '2', title: 'Item 2' },
+                { objectID: '3', title: 'Item 3' },
+                // Agrega tantos elementos como necesites
+            ],
+        },
+    };
+
+    axios.get.mockResolvedValue(data);
+
+    const { getAllByText } = render(<App />);
+
+    // Espera a que los elementos con el texto 'Item' estén presentes en el documento
+    await waitFor(() => getAllByText(/Item/i));
+
+    // Verifica que se renderizan la cantidad correcta de elementos
+    expect(getAllByText(/Item/i)).toHaveLength(data.data.hits.length);
+});
